@@ -1,0 +1,94 @@
+<html lang="en">
+    <head>
+        
+        <link rel="stylesheet" href="css/bootstrap.min.css">       
+
+        <style>
+        </style>
+        
+    </head>
+    <body ng-app="myApp">
+        
+        <div class="container-fluid" style="padding:50px">
+            
+            <p class="text-center">By Mark Thien</p>
+            
+            <div ng-controller="formController">
+                
+                <form ng-submit="processForm()">
+                  <!-- NAME -->
+                  <div id="name-group" class="form-group">
+                    <input type="text" name="searchText" class="form-control" placeholder="Search Text Here" ng-model="formData.searchText">
+                  </div>
+                  <!-- SUBMIT BUTTON -->
+                  <button type="submit" class="btn btn-success btn-lg btn-block">
+                    <span class="glyphicon glyphicon-flash"></span> Search
+                  </button>
+                </form>   
+                
+                <div class="row"> 
+
+                    <div ng-repeat="x in photos">
+
+                        <div class="col-md-6 text-center">
+
+                            <image ng-src="{{x}}" />
+
+                        </div>  
+
+                    </div>    
+
+                </div>            
+                
+            </div>
+            
+ 
+        </div>         
+        
+        <script src="js/jquery-1.12.0.min.js"></script>   
+        <script src="js/bootstrap.min.js"></script>   
+        <script src="js/angular.min.js"></script>
+
+        <script>
+            
+            var app = angular.module('myApp', []), server = 'http://enormers.com:8009/';      
+            
+            app.controller('formController', function($scope, $http) {
+                
+                $http.get(server+"get-public-feed").then(function (response) {
+                    
+                    $scope.photos = response.data.object;
+                    
+                });                      
+                
+                $scope.formData = {};                
+                
+                // process the form
+                $scope.processForm = function() {
+                    
+                      $http({
+                        method  : 'POST',
+                        url     : server+'search-photo',
+                        data    : $.param($scope.formData),  // pass in data as strings
+                        headers : { 'Content-Type': 'application/x-www-form-urlencoded' } 
+                      }).success(function(data) {
+
+                            if (data.status === 200) {
+
+                                $scope.photos = data.object;
+
+                            } else {
+
+                                alert(data.text);  
+
+                            }
+
+                      });
+                };                
+                
+            });        
+            
+        </script>
+
+    </body>
+</html>
